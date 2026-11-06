@@ -76,4 +76,18 @@ public class TransportTest {
         request("Bearer test-token", "Origin: https://example.com\r\n", "{}")
             .startsWith("HTTP/1.1 403"));
   }
+  @Test
+  public void actualAppConnectionProbeCompletesHandshakeAndStatus() throws Exception {
+    assertTrue(ConnectionProbe.run("test-token").contains("index_status passed"));
+  }
+
+  @Test
+  public void actualAppConnectionProbeReportsUnauthorized() throws Exception {
+    try {
+      ConnectionProbe.run("wrong-token");
+      fail("Wrong token must not pass");
+    } catch (IOException e) {
+      assertTrue(e.getMessage().contains("HTTP 401"));
+    }
+  }
 }

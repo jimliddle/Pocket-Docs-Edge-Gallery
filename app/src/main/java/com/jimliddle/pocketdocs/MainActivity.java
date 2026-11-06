@@ -19,7 +19,9 @@ import org.json.*;
 public final class MainActivity extends Activity {
   private final ExecutorService worker = Executors.newSingleThreadExecutor();
   private final Handler handler = new Handler(Looper.getMainLooper());
-  private TextView status;
+  private TextView status, folderProgress, folderCoverage;
+  private ProgressBar refreshProgress;
+  private Button refreshButton;
   private LinearLayout body;
   private EditText query;
   private final Runnable refresh =
@@ -77,7 +79,25 @@ public final class MainActivity extends Activity {
               Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
           startActivityForResult(i, 42);
         });
-    button("Refresh folders", () -> start("index"));
+    refreshButton = new Button(this);
+    refreshButton.setId(R.id.refresh_folders);
+    refreshButton.setText("Refresh folders");
+    body.addView(refreshButton);
+    refreshButton.setOnClickListener(v -> {
+      folderProgress.setText("Starting folder refresh…");
+      refreshProgress.setVisibility(android.view.View.VISIBLE);
+      start("index");
+    });
+    folderProgress = text("", 15);
+    folderProgress.setId(R.id.folder_progress);
+    folderProgress.setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
+    refreshProgress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+    refreshProgress.setIndeterminate(true);
+    refreshProgress.setId(R.id.refresh_progress);
+    refreshProgress.setVisibility(android.view.View.GONE);
+    body.addView(refreshProgress);
+    folderCoverage = text("", 15);
+    folderCoverage.setId(R.id.folder_coverage);
     button("Folder coverage / remove folder", this::folders);
     text("PDF text recognition", 21);
     text(
@@ -149,7 +169,7 @@ public final class MainActivity extends Activity {
                 .setNegativeButton("Cancel", null)
                 .show());
     text(
-        "0.3.0 · Android 8+ · ARM64\n"
+        "0.3.1 · Android 8+ · ARM64\n"
             + "PDF and UTF-8 text files. Manual refresh; changed or deleted files remain searchable"
             + " until refreshed. Server stops after 30 minutes. OCR can take time on long scans.\n"
             + "Includes PDFBox, ONNX Runtime, MiniLM, NanoHTTPD and Google ML Kit. ML Kit can send"
@@ -218,12 +238,25 @@ public final class MainActivity extends Activity {
         });
   }
 
-  private void updateStatus() {
+  void updateStatus() {
     if (status != null)
       status.setText(
           (DocsService.running ? "Server running" : "Server stopped")
               + "\n"
               + DocsService.progress);
+    if (folderProgress != null) {
+      folderProgress.setText(DocsService.progress);
+      refreshProgress.setVisibility(DocsService.indexing ? android.view.View.VISIBLE : android.view.View.GONE);
+      refreshButton.setEnabled(!DocsService.indexing);
+      StringBuilder coverage = new StringBuilder();
+      for (String[] root : Store.get(this).roots()) {
+        if (coverage.length() > 0) coverage.append("\n\n");
+        coverage.append(root[1]).append("\n")
+            .append(root[2].isEmpty() ? "Not refreshed" : "Last refreshed: " + root[2])
+            .append("\n").append(root[3]);
+      }
+      folderCoverage.setText(coverage.length() == 0 ? "No folders selected." : coverage.toString());
+    }
   }
 
   private void folders() {
@@ -278,33 +311,7 @@ public final class MainActivity extends Activity {
   }
 
   private String testConnection() throws Exception {
-    HttpURLConnection c = (HttpURLConnection) new URL("http://127.0.0.1:8766/mcp").openConnection();
-    c.setConnectTimeout(5000);
-    c.setReadTimeout(10000);
-    c.setRequestMethod("POST");
-    c.setDoOutput(true);
-    c.setRequestProperty("Authorization", "Bearer " + DocsService.token(this));
-    c.setRequestProperty("Content-Type", "application/json");
-    try {
-      try (OutputStream out = c.getOutputStream()) {
-        out.write(
-            "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\"}"
-                .getBytes(StandardCharsets.UTF_8));
-      }
-      int code = c.getResponseCode();
-      if (code != 200) return "Connection returned HTTP " + code;
-      try (InputStream in = c.getInputStream()) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] b = new byte[4096];
-        int n;
-        while ((n = in.read(b)) != -1) out.write(b, 0, n);
-        JSONObject response = new JSONObject(out.toString("UTF-8"));
-        return "Connected. Available tools: "
-            + response.getJSONObject("result").getJSONArray("tools").length();
-      }
-    } finally {
-      c.disconnect();
-    }
+    return ConnectionProbe.run(DocsService.token(this));
   }
 
   private String testOcr() throws Exception {

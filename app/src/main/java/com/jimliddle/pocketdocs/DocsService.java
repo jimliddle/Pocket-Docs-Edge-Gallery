@@ -90,6 +90,7 @@ public final class DocsService extends Service {
         && running
         && indexLock.compareAndSet(false, true)) {
       indexing = true;
+      progress = "Starting folder refresh…";
       worker.submit(
           () -> {
             try {

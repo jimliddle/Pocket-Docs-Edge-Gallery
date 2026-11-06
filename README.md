@@ -4,6 +4,13 @@ Search documents stored on your Android phone from AI Edge Gallery. Choose the f
 
 Pocket Docs combines keyword search with local MiniLM embeddings. Version 0.3.0 adds OCR for scanned PDFs and smaller search responses to leave more room for the model's answer.
 
+## 0.3.1 fixes
+
+- The in-app MCP connection test explicitly sends the required `Accept` header. It now checks initialization, discovery of the three expected tools, and an actual `index_status` call.
+- Refresh progress, a busy indicator, and each folder's latest coverage report appear directly below **Refresh folders**. They update while this screen is open; completed reports remain visible when it is reopened.
+- Regression tests exercise the same connection probe used by the button and the activity's progress/coverage views. The original transport tests constructed their own request and missed the app's missing header.
+- The GitHub build requests supported Android SDK packages rather than the retired `tools` package.
+
 ## Set up
 
 Requires Android 8 or later and a 64-bit ARM phone. This is a development build for testing.

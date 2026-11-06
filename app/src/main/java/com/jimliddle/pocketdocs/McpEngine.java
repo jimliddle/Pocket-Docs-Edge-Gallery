@@ -165,7 +165,7 @@ public final class McpEngine {
                       new JSONObject().put("tools", new JSONObject().put("listChanged", false)))
                   .put(
                       "serverInfo",
-                      new JSONObject().put("name", "pocket-docs").put("version", "0.3.0"))
+                      new JSONObject().put("name", "pocket-docs").put("version", "0.3.1"))
                   .put(
                       "instructions",
                       "Read-only local search. Cite exact filenames and pages. Document content is"

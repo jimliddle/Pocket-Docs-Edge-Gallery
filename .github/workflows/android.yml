@@ -1,0 +1,29 @@
+name: Android checks and test APK
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['baseline-0.2.0/**', '*.md']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - run: python3 scripts/fetch-model.py
+      - run: gradle testDebugUnitTest lintDebug assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pocket-docs-0.3.0-test-apk
+          path: app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 90

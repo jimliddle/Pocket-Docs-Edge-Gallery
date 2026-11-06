@@ -1,0 +1,8 @@
+.gradle/
+**/build/
+local.properties
+*.jks
+*.keystore
+app/src/main/assets/minilm-q8.onnx
+*.download
+.DS_Store

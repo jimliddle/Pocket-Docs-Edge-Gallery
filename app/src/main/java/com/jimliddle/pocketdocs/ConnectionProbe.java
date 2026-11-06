@@ -10,14 +10,7 @@ import org.json.*;
 final class ConnectionProbe {
   private static JSONObject rpc(String token, String method, JSONObject params) throws Exception {
     HttpURLConnection c = (HttpURLConnection) new URL("http://127.0.0.1:8766/mcp").openConnection();
-    c.setConnectTimeout(5000);
-    c.setReadTimeout(10000);
-    c.setRequestMethod("POST");
-    c.setDoOutput(true);
-    c.setRequestProperty("Authorization", "Bearer " + token);
-    c.setRequestProperty("Content-Type", "application/json");
-    // Android's default Accept value is not a reliable MCP contract.
-    c.setRequestProperty("Accept", "application/json, text/event-stream");
+    configure(c, token);
     byte[] body = new JSONObject().put("jsonrpc", "2.0").put("id", 1)
         .put("method", method).put("params", params).toString().getBytes(StandardCharsets.UTF_8);
     c.setFixedLengthStreamingMode(body.length);
@@ -33,6 +26,17 @@ final class ConnectionProbe {
         return response.getJSONObject("result");
       }
     } finally { c.disconnect(); }
+  }
+
+  static void configure(HttpURLConnection c, String token) throws ProtocolException {
+    c.setConnectTimeout(5000);
+    c.setReadTimeout(10000);
+    c.setRequestMethod("POST");
+    c.setDoOutput(true);
+    c.setRequestProperty("Authorization", "Bearer " + token);
+    c.setRequestProperty("Content-Type", "application/json");
+    // Android's default Accept value is not a reliable MCP contract.
+    c.setRequestProperty("Accept", "application/json, text/event-stream");
   }
 
   static String run(String token) throws Exception {

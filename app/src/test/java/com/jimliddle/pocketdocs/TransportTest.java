@@ -90,4 +90,15 @@ public class TransportTest {
       assertTrue(e.getMessage().contains("HTTP 401"));
     }
   }
+  @Test
+  public void appExplicitlySetsAcceptInsteadOfDependingOnPlatformDefault() throws Exception {
+    HttpURLConnection connection = (HttpURLConnection) new URL("http://127.0.0.1:8766/mcp").openConnection();
+    try {
+      assertNull(connection.getRequestProperty("Accept"));
+      ConnectionProbe.configure(connection, "test-token");
+      assertEquals("application/json, text/event-stream", connection.getRequestProperty("Accept"));
+      assertEquals("application/json", connection.getRequestProperty("Content-Type"));
+      assertEquals("POST", connection.getRequestMethod());
+    } finally { connection.disconnect(); }
+  }
 }

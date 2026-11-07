@@ -1,6 +1,6 @@
 # Pocket Docs for AI Edge Gallery
 
-Search documents stored on your Android phone from AI Edge Gallery. Choose the folders Pocket Docs can read, refresh the index, then ask questions through its local MCP server.
+The aim here is to allow one to search documents stored on an Android phone from AI Edge Gallery. Choose the folders Pocket Docs can read, refresh the index, then ask questions through its local MCP server.
 
 Pocket Docs combines keyword search with local MiniLM embeddings. Version 0.3.0 adds OCR for scanned PDFs and smaller search responses to leave more room for the model's answer.
 

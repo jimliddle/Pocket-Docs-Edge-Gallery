@@ -24,9 +24,14 @@ public final class HybridRanker {
 
   public static List<Hit> fuse(List<Hit> a, List<Hit> b, int limit) {
     Map<String, Double> scores = new HashMap<>();
-    for (List<Hit> list : Arrays.asList(a, b))
-      for (int i = 0; i < list.size(); i++)
-        scores.merge(list.get(i).id, 1.0 / (61 + i), Double::sum);
+    for (List<Hit> list : Arrays.asList(a, b)) {
+      int rank = 0;
+      for (int i = 0; i < list.size(); i++) {
+        // Equal relevance scores receive equal weight, independent of file/URI hashes.
+        if (i == 0 || Double.compare(list.get(i).score, list.get(i - 1).score) != 0) rank = i;
+        scores.merge(list.get(i).id, 1.0 / (61 + rank), Double::sum);
+      }
+    }
     List<Hit> out = new ArrayList<>();
     for (Map.Entry<String, Double> e : scores.entrySet())
       out.add(new Hit(e.getKey(), e.getValue()));

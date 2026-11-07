@@ -25,7 +25,12 @@ public final class Regression {
       "parallelization"
     },
     {"future words", "How does the decoder prevent attention to future words?", "mask", "position"},
-    {"word order", "How does the model know the order of the words?", "positional", "encoding"},
+    {
+      "word order",
+      "How does the model know the order of the words?",
+      "positional",
+      "input embeddings"
+    },
     {
       "attention calculation",
       "How is scaled dot-product attention calculated?",
@@ -48,7 +53,7 @@ public final class Regression {
     },
     {"attention heads", "How many parallel attention heads are used?", "h = 8"},
     {"warmup", "How many warmup steps does the learning rate schedule use?", "4000"},
-    {"word order focused", "positional encoding word order", "positional", "encoding"},
+    {"word order focused", "positional encoding word order", "positional", "input embeddings"},
     {"attention heads focused", "multi-head attention number of heads h", "h = 8"},
     {"dropout", "What dropout rate is used in the base model?", "0.1"}
   };
@@ -120,7 +125,7 @@ public final class Regression {
         String normalized = evidence.toString().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
         boolean ok = true;
         for (int i = 2; i < test.length; i++) ok &= normalized.contains(test[i]);
-        boolean knownMiss = test[0].equals("word order") || test[0].equals("attention heads");
+        boolean knownMiss = test[0].equals("word order");
         if (ok) passed++;
         else if (!knownMiss) regressions++;
         fixtureCases.put(
@@ -158,7 +163,7 @@ public final class Regression {
       }
       if (regressions > 0)
         throw new AssertionError(
-            regressions + " new evidence regressions (two documented misses remain)");
+            regressions + " new evidence regressions (one documented miss remains)");
     }
   }
 }

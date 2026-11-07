@@ -74,4 +74,15 @@ public class TextToolsTest {
     assertEquals(text, out.getJSONObject(0).getString("text"));
     assertFalse(out.getJSONObject(0).getBoolean("excerpt"));
   }
+
+  @Test
+  public void tiedKeywordScoresHaveEqualFusionWeight() {
+    java.util.List<HybridRanker.Hit> lex =
+        java.util.Arrays.asList(new HybridRanker.Hit("a", 2), new HybridRanker.Hit("b", 2));
+    java.util.List<HybridRanker.Hit> sem =
+        java.util.Arrays.asList(new HybridRanker.Hit("b", .8), new HybridRanker.Hit("a", .7));
+    java.util.List<HybridRanker.Hit> result = HybridRanker.fuse(lex, sem, 2);
+    assertEquals("b", result.get(0).id);
+    assertTrue(result.get(0).score > result.get(1).score);
+  }
 }

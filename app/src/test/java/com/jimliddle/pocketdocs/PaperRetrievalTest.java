@@ -91,21 +91,24 @@ public class PaperRetrievalTest {
                     .getString("text"));
         JSONArray out = response.getJSONArray("passages");
         StringBuilder text = new StringBuilder();
+        StringBuilder locations = new StringBuilder();
         int chars = 0;
         assertTrue(out.length() <= 3);
         for (int n = 0; n < out.length(); n++) {
           JSONObject p = out.getJSONObject(n);
           assertEquals("1706.03762.pdf", p.getString("filename"));
           chars += p.getString("text").length();
+          locations.append("p").append(p.getInt("page")).append("c").append(p.getInt("chunk")).append(" ");
           text.append(p.getString("text")).append(' ');
         }
         assertTrue(chars <= 4800);
+        System.out.println(test.getString("name")+": "+locations);
         if (test.getBoolean("known_miss")) continue;
         String normalized = text.toString().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
         JSONArray expected = test.getJSONArray("expected");
         for (int n = 0; n < expected.length(); n++)
           assertTrue(
-              test.getString("name") + ": missing " + expected.getString(n),
+              test.getString("name") + ": missing " + expected.getString(n)+" in "+locations,
               normalized.contains(expected.getString(n)));
       }
     } finally {

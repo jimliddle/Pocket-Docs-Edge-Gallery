@@ -7,7 +7,7 @@ The reported question was:
 
 > how do the authors let a model process more of a sentence at once, rather than working through it one word at a time?
 
-With 0.3.1 retrieval settings, the first two results were page 7 (training batches) and page 1 (abstract). The response omitted the explanation of self-attention. With 0.3.2 the final response includes page 2's explanation as well. The batching passage still ranks first; this change improves evidence coverage rather than guaranteeing the best passage ranks first.
+With 0.3.1 retrieval settings, the first two results were page 7 (training batches) and page 1 (abstract). The response omitted the explanation of self-attention. With 0.3.2 the final response includes page 2's explanation as well. Equal keyword scores now receive equal fusion weight, rather than different weights determined by file hashes. The batching passage still ranks first; this change improves evidence coverage rather than guaranteeing the best passage ranks first.
 
 ## Method
 
@@ -27,13 +27,13 @@ The script also generates an uncommitted test fixture containing the paper chunk
 | Training hardware and duration | Missing | Present |
 | Grouping sentence pairs into batches | Missing | Present |
 | English–German BLEU score | Present | Present |
-| Number of parallel attention heads | Missing | Missing |
+| Number of parallel attention heads | Missing | Present |
 | Warmup steps | Present | Present |
 | Focused query: positional encoding word order | Present | Present |
 | Focused query: multi-head attention number of heads h | Present | Present |
 | Base-model dropout | Present | Present |
 
-Totals: **8/13 before, 11/13 after**. Excluding the two explicitly focused follow-ups: **6/11 before, 9/11 after**. The two unresolved natural-language queries are labelled `KNOWN MISS` in the report; they are not counted as passes. Any new miss among the other checks fails the build. The focused follow-ups demonstrate recovery, not automatic query rewriting.
+Totals: **8/13 before, 12/13 after**. Excluding the two explicitly focused follow-ups: **6/11 before, 10/11 after**. The unresolved word-order query is labelled `KNOWN MISS` in the report; it is not counted as a pass. Any new miss among the other checks fails the build. The focused follow-ups demonstrate recovery, not automatic query rewriting.
 
 ## Limits and phone checks
 

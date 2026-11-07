@@ -8,9 +8,10 @@ Pocket Docs combines keyword search with local MiniLM embeddings. Version 0.3.0 
 
 - Chunks prefer sentence boundaries. Keyword matching uses whole words with simple singular/plural matching, so short terms do not match inside unrelated words.
 - Search returns three passages by default, with up to 1,600 characters each and a 4,800 character total text budget. This retains explanations that the previous 650-character excerpts cut off.
+- Tied keyword scores receive equal ranking weight instead of depending on file hashes.
 - Bibliography-heavy chunks receive less weight unless the question asks about citations or references. The embedding model is unchanged.
 - **Refresh folders after installing** to rebuild the chunks. The extraction cache version changes automatically; there is no need to clear the index first.
-- The [retrieval report](docs/retrieval-0.3.2.md) includes the reported failure, additional questions and two remaining retrieval misses. Tests use the actual model, then exercise the SQLite/MCP path with those vectors.
+- The [retrieval report](docs/retrieval-0.3.2.md) includes the reported failure, additional questions and the remaining word-order retrieval miss. Tests use the actual model, then exercise the SQLite/MCP path with those vectors.
 
 ## 0.3.1 fixes
 

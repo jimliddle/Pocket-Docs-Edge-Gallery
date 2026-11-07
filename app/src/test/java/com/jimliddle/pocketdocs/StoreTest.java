@@ -95,4 +95,12 @@ public class StoreTest {
     assertEquals(0, store.status().getInt("passages"));
     assertNull(store.cachedDocument(root, "doc", "a"));
   }
+
+  @Test
+  public void multiTermPrefixQueryWorksWithFts4() throws Exception {
+    insert("fts-test");
+    assertEquals(1, store.keywordSearch("warranty repair unrelated", 3).length());
+    assertEquals(1, store.keywordSearch("warranty repairs unrelated", 3).length());
+    assertEquals(0, store.keywordSearch("war rep", 3).length());
+  }
 }

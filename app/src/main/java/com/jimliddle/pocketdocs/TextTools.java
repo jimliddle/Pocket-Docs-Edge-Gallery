@@ -76,7 +76,7 @@ public final class TextTools {
     List<String> q = new ArrayList<>();
     for (String w : words(query)) {
       String stem = w.length() > 4 && w.endsWith("s") ? w.substring(0, w.length() - 1) : w;
-      q.add("\"" + stem + "\"*");
+      q.add("\"" + stem + "*\"");
     }
     return String.join(" OR ", q);
   }

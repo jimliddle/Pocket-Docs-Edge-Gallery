@@ -4,6 +4,8 @@ The aim here is to allow one to search documents stored on an Android phone from
 
 Pocket Docs combines keyword search with local MiniLM embeddings. Version 0.3.0 adds OCR for scanned PDFs and smaller search responses to leave more room for the model's answer.
 
+[Download the 0.3.2 test APK ZIP](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42402360453/artifacts/13586270803) (GitHub sign-in required; extract `app-debug.apk`). The artifact expires on 5 February 2027. See the signing-key note under Build before installing over a previous test build.
+
 ## 0.3.2 retrieval changes
 
 - Chunks prefer sentence boundaries. Keyword matching uses whole words with simple singular/plural matching, so short terms do not match inside unrelated words.

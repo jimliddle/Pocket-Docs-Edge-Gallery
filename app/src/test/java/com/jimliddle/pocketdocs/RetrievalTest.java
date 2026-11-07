@@ -23,7 +23,7 @@ public class RetrievalTest {
     JSONObject p =
         SearchResponse.compact(new JSONArray().put(passage("id", text)), "parallel computation", 2)
             .getJSONObject(0);
-    assertTrue(p.getString("text").length() <= 650);
+    assertTrue(p.getString("text").length() <= SearchResponse.MAX_EXCERPT);
     assertTrue(text.contains(p.getString("text")));
     assertTrue(p.getString("text").contains("parallel"));
     assertEquals("1706.03762.pdf", p.getString("filename"));
@@ -54,7 +54,7 @@ public class RetrievalTest {
     JSONArray out = SearchResponse.compact(input, "unique", 10);
     int n = 0;
     for (int i = 0; i < out.length(); i++) n += out.getJSONObject(i).getString("text").length();
-    assertTrue(n <= 2600);
+    assertTrue(n <= SearchResponse.MAX_TOTAL_TEXT);
   }
 
   @Test
@@ -88,7 +88,7 @@ public class RetrievalTest {
                 .getJSONArray("content")
                 .getJSONObject(0)
                 .getString("text"));
-    assertEquals(2, answer.getJSONArray("passages").length());
+    assertEquals(3, answer.getJSONArray("passages").length());
     assertFalse(answer.has("status"));
     req.getJSONObject("params")
         .put("name", "get_passage")

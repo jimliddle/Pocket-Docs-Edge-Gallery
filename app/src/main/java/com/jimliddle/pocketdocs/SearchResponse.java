@@ -5,29 +5,37 @@ import org.json.*;
 
 /** Bounded extractive output: never generates text or rewrites a citation. */
 public final class SearchResponse {
-  public static final int DEFAULT_LIMIT = 2, MAX_EXCERPT = 650, MAX_TOTAL_TEXT = 2600;
+  public static final int DEFAULT_LIMIT = 3, MAX_EXCERPT = 1600, MAX_TOTAL_TEXT = 4800;
 
   public static String excerpt(String text, String query, int max) {
     if (text.length() <= max) return text;
-    Set<String> words = TextTools.words(query);
-    int best = 0, bestScore = -1;
-    for (int i = 0; i < text.length(); i += 160) {
-      int end = Math.min(i + max, text.length());
-      String window = text.substring(i, end).toLowerCase(Locale.ROOT);
-      int score = 0;
-      for (String w : words) if (window.contains(w)) score++;
+    // Normal indexed chunks already fit. For oversized input, choose a word-aligned
+    // window and prefer complete sentences rather than cutting arbitrary characters.
+    int best = 0, bestEnd = Math.min(max, text.length()), bestScore = -1;
+    for (int start = 0; start < text.length(); ) {
+      int end = Math.min(start + max, text.length());
+      if (end < text.length()) {
+        while (end > start && !Character.isWhitespace(text.charAt(end))) end--;
+        if (end == start) end = Math.min(start + max, text.length());
+      }
+      int score = TextTools.score(query, "", text.substring(start, end));
       if (score > bestScore) {
         bestScore = score;
-        best = i;
+        best = start;
+        bestEnd = end;
       }
       if (end == text.length()) break;
+      int next = Math.min(start + 160, text.length());
+      while (next < text.length() && !Character.isWhitespace(text.charAt(next - 1))) next++;
+      start = next;
     }
-    int end = Math.min(best + max, text.length());
-    if (end < text.length()) {
-      int space = text.lastIndexOf(' ', end);
-      if (space > best + max / 2) end = space;
-    }
-    return text.substring(best, end).trim();
+    String result = text.substring(best, bestEnd).trim();
+    int sentenceEnd =
+        Math.max(
+            result.lastIndexOf(". "), Math.max(result.lastIndexOf("! "), result.lastIndexOf("? ")));
+    if (bestEnd < text.length() && sentenceEnd >= result.length() * 3 / 4)
+      result = result.substring(0, sentenceEnd + 1);
+    return result;
   }
 
   static Set<String> shingles(String text) {

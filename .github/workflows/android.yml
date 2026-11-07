@@ -23,6 +23,7 @@ jobs:
         with:
           gradle-version: '8.9'
       - run: python3 scripts/fetch-model.py
+      - run: python3 scripts/test-retrieval.py
       - run: gradle testDebugUnitTest lintDebug assembleDebug
       - uses: actions/upload-artifact@v4
         if: always()
@@ -31,6 +32,6 @@ jobs:
           path: app/build/reports/
       - uses: actions/upload-artifact@v4
         with:
-          name: pocket-docs-0.3.1-test-apk
+          name: pocket-docs-0.3.2-test-apk
           path: app/build/outputs/apk/debug/app-debug.apk
           retention-days: 90

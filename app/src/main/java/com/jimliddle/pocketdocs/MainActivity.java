@@ -138,7 +138,7 @@ public final class MainActivity extends Activity {
           String q = query.getText().toString().trim();
           if (!q.isEmpty())
             background(
-                () -> SearchResponse.compact(Store.get(this).search(q, 6), q, 2).toString(2));
+                () -> SearchResponse.compact(Store.get(this).search(q, 9), q, SearchResponse.DEFAULT_LIMIT).toString(2));
         });
     button("Show index status", () -> background(() -> Store.get(this).status().toString(2)));
     button(
@@ -169,7 +169,7 @@ public final class MainActivity extends Activity {
                 .setNegativeButton("Cancel", null)
                 .show());
     text(
-        "0.3.1 · Android 8+ · ARM64\n"
+        "0.3.2 · Android 8+ · ARM64\n"
             + "PDF and UTF-8 text files. Manual refresh; changed or deleted files remain searchable"
             + " until refreshed. Server stops after 30 minutes. OCR can take time on long scans.\n"
             + "Includes PDFBox, ONNX Runtime, MiniLM, NanoHTTPD and Google ML Kit. ML Kit can send"

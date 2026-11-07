@@ -351,10 +351,13 @@ public final class Store extends SQLiteOpenHelper implements DocRepository {
                   "SELECT p.id,p.title,p.body FROM passages p JOIN passage_fts f ON p.id=f.id WHERE"
                       + " passage_fts MATCH ?",
                   new String[] {fts})) {
-        while (c.moveToNext())
-          hits.add(
-              new HybridRanker.Hit(
-                  c.getString(0), TextTools.score(query, c.getString(1), c.getString(2))));
+        while (c.moveToNext()) {
+          int score = TextTools.score(query, c.getString(1), c.getString(2));
+          if (score > 0)
+            hits.add(
+                new HybridRanker.Hit(
+                    c.getString(0), score * TextTools.referenceWeight(query, c.getString(2))));
+        }
       }
     return HybridRanker.sorted(hits, 30);
   }
@@ -386,12 +389,15 @@ public final class Store extends SQLiteOpenHelper implements DocRepository {
         try (Cursor c =
             getReadableDatabase()
                 .rawQuery(
-                    "SELECT id,embedding FROM passages WHERE embedding IS NOT NULL AND model=?",
+                    "SELECT id,embedding,body FROM passages WHERE embedding IS NOT NULL AND"
+                        + " model=?",
                     new String[] {EmbeddingEngine.MODEL_ID})) {
           while (c.moveToNext()) {
             double score = HybridRanker.cosine(q, c.getBlob(1));
             if (score >= HybridRanker.MIN_COSINE)
-              s.add(new HybridRanker.Hit(c.getString(0), score));
+              s.add(
+                  new HybridRanker.Hit(
+                      c.getString(0), score * TextTools.referenceWeight(query, c.getString(2))));
           }
         }
       } catch (IllegalStateException e) {

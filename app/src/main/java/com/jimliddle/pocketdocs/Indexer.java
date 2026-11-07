@@ -130,7 +130,7 @@ public final class Indexer {
         }
         StringBuilder hex = new StringBuilder();
         for (byte b : digest.digest()) hex.append(String.format(Locale.ROOT, "%02x", b & 255));
-        String fingerprint = TextTools.hash(hex + "\n" + title + "\nocr-v1:" + mode);
+        String fingerprint = TextTools.hash(hex + "\n" + title + "\nsentences-v2:ocr-v1:" + mode);
         Store.CachedDocument cached = store.cachedDocument(root, docId, fingerprint);
         if (cached != null && out.size() + cached.passages.size() <= 5000) {
           out.addAll(cached.passages);

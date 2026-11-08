@@ -4,9 +4,12 @@ The aim here is to allow one to search documents stored on an Android phone from
 
 Pocket Docs combines keyword search with local MiniLM embeddings. Version 0.3.0 adds OCR for scanned PDFs and smaller search responses to leave more room for the model's answer.
 
-[Download the 0.3.2 test APK ZIP](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42402360453/artifacts/13586270803) (GitHub sign-in required; extract `app-debug.apk`). The artifact expires on 5 February 2027. See the signing-key note under Build before installing over a previous test build.
+[Download the 0.3.3 test APK ZIP](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42505958562/artifacts/13626659423) (GitHub sign-in required; extract `app-debug.apk`). The artifact expires on 6 February 2027. See the signing-key note under Build before installing over a previous test build.
 
 ## 0.3.3 response-format comparison
+
+[Build 42505958562](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42505958562) produced the APK from commit `cd5279b85c510d43d1dabcba03aa4847860125c6`. All 36 automated tests passed with none skipped; Android lint reported zero errors and 13 warnings. The unchanged retrieval benchmark remains at 12/13 evidence checks. These results verify the transport and response content, not the quality of Gemma's generated answer.
+
 
 This test build changes how `search_documents` presents its result. By default it returns labelled passages with actual line breaks, exact filenames, page/chunk numbers and passage IDs. It does not add the previous advisory note. Source text, result order, retrieval model, chunking, three-passage default and text budgets remain unchanged from 0.3.2. `index_status` and `get_passage` keep their existing formats.
 

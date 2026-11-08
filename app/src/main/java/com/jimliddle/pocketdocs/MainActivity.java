@@ -12,7 +12,6 @@ import androidx.documentfile.provider.DocumentFile;
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import java.io.*;
 import java.net.*;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.*;
 import org.json.*;
 
@@ -70,6 +69,19 @@ public final class MainActivity extends Activity {
         "Copy Authorization value",
         () -> copy("Authorization", "Bearer " + DocsService.token(this)));
     button("Test local MCP connection", () -> background(() -> testConnection()));
+    text("Search response format", 21);
+    CheckBox readable = new CheckBox(this);
+    readable.setId(R.id.readable_search);
+    readable.setText("Readable passages (uncheck for previous JSON format)");
+    readable.setChecked(getSharedPreferences("settings", 0).getBoolean("readable_search", true));
+    readable.setOnCheckedChangeListener(
+        (button, enabled) ->
+            getSharedPreferences("settings", 0)
+                .edit()
+                .putBoolean("readable_search", enabled)
+                .apply());
+    body.addView(readable);
+    text("Applies to the next search. No server restart or folder refresh needed.", 15);
     text("Folders and indexing", 21);
     button(
         "Choose a folder",
@@ -83,11 +95,12 @@ public final class MainActivity extends Activity {
     refreshButton.setId(R.id.refresh_folders);
     refreshButton.setText("Refresh folders");
     body.addView(refreshButton);
-    refreshButton.setOnClickListener(v -> {
-      folderProgress.setText("Starting folder refresh…");
-      refreshProgress.setVisibility(android.view.View.VISIBLE);
-      start("index");
-    });
+    refreshButton.setOnClickListener(
+        v -> {
+          folderProgress.setText("Starting folder refresh…");
+          refreshProgress.setVisibility(android.view.View.VISIBLE);
+          start("index");
+        });
     folderProgress = text("", 15);
     folderProgress.setId(R.id.folder_progress);
     folderProgress.setAccessibilityLiveRegion(android.view.View.ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -138,7 +151,10 @@ public final class MainActivity extends Activity {
           String q = query.getText().toString().trim();
           if (!q.isEmpty())
             background(
-                () -> SearchResponse.compact(Store.get(this).search(q, 9), q, SearchResponse.DEFAULT_LIMIT).toString(2));
+                () ->
+                    SearchResponse.compact(
+                            Store.get(this).search(q, 9), q, SearchResponse.DEFAULT_LIMIT)
+                        .toString(2));
         });
     button("Show index status", () -> background(() -> Store.get(this).status().toString(2)));
     button(
@@ -169,7 +185,7 @@ public final class MainActivity extends Activity {
                 .setNegativeButton("Cancel", null)
                 .show());
     text(
-        "0.3.2 · Android 8+ · ARM64\n"
+        "0.3.3 · Android 8+ · ARM64\n"
             + "PDF and UTF-8 text files. Manual refresh; changed or deleted files remain searchable"
             + " until refreshed. Server stops after 30 minutes. OCR can take time on long scans.\n"
             + "Includes PDFBox, ONNX Runtime, MiniLM, NanoHTTPD and Google ML Kit. ML Kit can send"
@@ -246,14 +262,18 @@ public final class MainActivity extends Activity {
               + DocsService.progress);
     if (folderProgress != null) {
       folderProgress.setText(DocsService.progress);
-      refreshProgress.setVisibility(DocsService.indexing ? android.view.View.VISIBLE : android.view.View.GONE);
+      refreshProgress.setVisibility(
+          DocsService.indexing ? android.view.View.VISIBLE : android.view.View.GONE);
       refreshButton.setEnabled(!DocsService.indexing);
       StringBuilder coverage = new StringBuilder();
       for (String[] root : Store.get(this).roots()) {
         if (coverage.length() > 0) coverage.append("\n\n");
-        coverage.append(root[1]).append("\n")
+        coverage
+            .append(root[1])
+            .append("\n")
             .append(root[2].isEmpty() ? "Not refreshed" : "Last refreshed: " + root[2])
-            .append("\n").append(root[3]);
+            .append("\n")
+            .append(root[3]);
       }
       folderCoverage.setText(coverage.length() == 0 ? "No folders selected." : coverage.toString());
     }

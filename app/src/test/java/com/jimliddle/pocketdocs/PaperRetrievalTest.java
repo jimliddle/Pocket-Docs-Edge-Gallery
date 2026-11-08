@@ -67,7 +67,8 @@ public class PaperRetrievalTest {
                 p.getString("text")));
       }
       store.replaceRoot(root, store.roots().get(0)[4], passages, "OK");
-      McpEngine engine = new McpEngine(store);
+      McpEngine engine = new McpEngine(store, () -> false);
+      McpEngine readableEngine = new McpEngine(store);
       JSONArray cases = fixture.getJSONArray("cases");
       for (int i = 0; i < cases.length(); i++) {
         JSONObject test = cases.getJSONObject(i);
@@ -90,6 +91,14 @@ public class PaperRetrievalTest {
                     .getJSONObject(0)
                     .getString("text"));
         JSONArray out = response.getJSONArray("passages");
+        String readable =
+            readableEngine
+                .handle(request)
+                .getJSONObject("result")
+                .getJSONArray("content")
+                .getJSONObject(0)
+                .getString("text");
+        assertEquals(PassageText.format(out), readable);
         StringBuilder text = new StringBuilder();
         StringBuilder locations = new StringBuilder();
         int chars = 0;
@@ -98,17 +107,22 @@ public class PaperRetrievalTest {
           JSONObject p = out.getJSONObject(n);
           assertEquals("1706.03762.pdf", p.getString("filename"));
           chars += p.getString("text").length();
-          locations.append("p").append(p.getInt("page")).append("c").append(p.getInt("chunk")).append(" ");
+          locations
+              .append("p")
+              .append(p.getInt("page"))
+              .append("c")
+              .append(p.getInt("chunk"))
+              .append(" ");
           text.append(p.getString("text")).append(' ');
         }
         assertTrue(chars <= 4800);
-        System.out.println(test.getString("name")+": "+locations);
+        System.out.println(test.getString("name") + ": " + locations);
         if (test.getBoolean("known_miss")) continue;
         String normalized = text.toString().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
         JSONArray expected = test.getJSONArray("expected");
         for (int n = 0; n < expected.length(); n++)
           assertTrue(
-              test.getString("name") + ": missing " + expected.getString(n)+" in "+locations,
+              test.getString("name") + ": missing " + expected.getString(n) + " in " + locations,
               normalized.contains(expected.getString(n)));
       }
     } finally {

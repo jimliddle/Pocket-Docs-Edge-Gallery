@@ -62,7 +62,11 @@ public final class DocsService extends Service {
             .build());
     PDFBoxResourceLoader.init(getApplicationContext());
     try {
-      server = new LocalServer(token(this), Store.get(this));
+      server =
+          new LocalServer(
+              token(this),
+              Store.get(this),
+              () -> getSharedPreferences("settings", 0).getBoolean("readable_search", true));
       server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       running = true;
       progress = "Ready on this phone";

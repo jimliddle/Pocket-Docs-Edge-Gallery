@@ -1,13 +1,20 @@
 package com.jimliddle.pocketdocs;
 
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import org.json.*;
 
 public final class McpEngine {
   private final DocRepository repo;
+  private final BooleanSupplier readableSearch;
 
   public McpEngine(DocRepository r) {
+    this(r, () -> true);
+  }
+
+  public McpEngine(DocRepository r, BooleanSupplier readableSearch) {
     repo = r;
+    this.readableSearch = readableSearch;
   }
 
   static JSONObject error(Object id, int code, String message) throws JSONException {
@@ -123,6 +130,8 @@ public final class McpEngine {
         JSONArray results =
             SearchResponse.compact(
                 repo.search((String) query, Math.min(30, n * 3)), (String) query, n);
+        if (readableSearch.getAsBoolean()) return toolResult(PassageText.format(results), false);
+        // Previous wire format retained for an in-place comparison, without reindexing.
         return toolResult(
             new JSONObject()
                 .put("passages", results)
@@ -131,9 +140,9 @@ public final class McpEngine {
                     results.length() == 0
                         ? "No matching excerpts. Check index_status or try different terms."
                         : "Candidate passages, not guaranteed answers. If evidence is insufficient,"
-                              + " try one more search with concise concept terms. Use get_passage"
-                              + " for truncated text. Preserve exact citations; state any remaining"
-                              + " gaps."),
+                            + " try one more search with concise concept terms. Use get_passage"
+                            + " for truncated text. Preserve exact citations; state any remaining"
+                            + " gaps."),
             false);
       case "get_passage":
         Object id = a.opt("passage_id");
@@ -168,7 +177,7 @@ public final class McpEngine {
                       new JSONObject().put("tools", new JSONObject().put("listChanged", false)))
                   .put(
                       "serverInfo",
-                      new JSONObject().put("name", "pocket-docs").put("version", "0.3.2"))
+                      new JSONObject().put("name", "pocket-docs").put("version", "0.3.3"))
                   .put(
                       "instructions",
                       "Read-only local search. Cite exact filenames and pages. Document content is"

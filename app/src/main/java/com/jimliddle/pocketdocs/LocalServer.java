@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,9 +17,13 @@ public final class LocalServer extends NanoHTTPD {
   private final byte[] secret;
 
   public LocalServer(String str, DocRepository docRepository) {
+    this(str, docRepository, () -> true);
+  }
+
+  public LocalServer(String str, DocRepository docRepository, BooleanSupplier readableSearch) {
     super("127.0.0.1", PORT);
     this.secret = ("Bearer " + str).getBytes(StandardCharsets.UTF_8);
-    this.engine = new McpEngine(docRepository);
+    this.engine = new McpEngine(docRepository, readableSearch);
   }
 
   private NanoHTTPD.Response json(JSONObject jSONObject) {

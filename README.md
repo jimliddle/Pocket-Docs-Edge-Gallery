@@ -6,6 +6,16 @@ Pocket Docs combines keyword search with local MiniLM embeddings. Version 0.3.0 
 
 [Download the 0.3.2 test APK ZIP](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42402360453/artifacts/13586270803) (GitHub sign-in required; extract `app-debug.apk`). The artifact expires on 5 February 2027. See the signing-key note under Build before installing over a previous test build.
 
+## 0.3.3 response-format comparison
+
+This test build changes how `search_documents` presents its result. By default it returns labelled passages with actual line breaks, exact filenames, page/chunk numbers and passage IDs. It does not add the previous advisory note. Source text, result order, retrieval model, chunking, three-passage default and text budgets remain unchanged from 0.3.2. `index_status` and `get_passage` keep their existing formats.
+
+Under **Search response format**, leave **Readable passages** checked for the new format. Uncheck it to reproduce the previous JSON response, including its original note. The switch takes effect on the next tool call without restarting the server, changing the token or refreshing folders. This allows both formats to be compared within one installation.
+
+The phone screenshots confirmed that 0.3.2 delivered all three passages, including the relevant page 2 explanation, but Gemma still gave an incorrect answer. The new format is an experiment to address that failure, not a confirmed fix. For a useful comparison, use the same question and model settings in a fresh conversation for each format. Do not change token limits or the system prompt between those two runs.
+
+The automated tests check exact source-text preservation, citation fields, empty results, fallback warnings, switching formats over a running authenticated connection, and both formats through the real-vector SQLite/MCP regression test. They do not run Gemma or establish whether its answer improves.
+
 ## 0.3.2 retrieval changes
 
 - Chunks prefer sentence boundaries. Keyword matching uses whole words with simple singular/plural matching, so short terms do not match inside unrelated words.

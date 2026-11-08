@@ -77,7 +77,7 @@ public class RetrievalTest {
                 .put(RetrievalTest.this.passage("c", "gamma ".repeat(200)));
           }
         };
-    McpEngine e = new McpEngine(repo);
+    McpEngine e = new McpEngine(repo, () -> false);
     JSONObject req =
         new JSONObject(
             "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"search_documents\",\"arguments\":{\"query\":\"alpha\"}}}");

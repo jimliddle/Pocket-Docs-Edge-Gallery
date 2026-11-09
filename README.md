@@ -10,7 +10,10 @@ See the [changelog](CHANGELOG.md) for version history, build results and respons
 
 The example below is questioning the 'Attention Is All You Need' whitepaper stored on the phone
 
-<img width="618" height="820" alt="image" src="https://github.com/user-attachments/assets/63176f56-c0e1-403f-9f81-14c2a28af779" />
+<img width="309" height="410" alt="image" src="https://github.com/user-attachments/assets/19c5b444-7cc1-4fdb-84bf-7bcae37f6ec6" />
+
+
+<img width="309" height="410" alt="image" src="https://github.com/user-attachments/assets/63176f56-c0e1-403f-9f81-14c2a28af779" />
 
 
 ## Set up

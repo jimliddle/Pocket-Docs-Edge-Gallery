@@ -8,7 +8,7 @@ Pocket Docs combines keyword search with local MiniLM embeddings and on-device O
 
 See the [changelog](CHANGELOG.md) for version history, build results and response-format comparison notes.
 
-<img width="387" height="612" alt="image" src="https://github.com/user-attachments/assets/07233fb0-965b-4d6b-97ab-3e5448864eae" />
+<img width="386" height="612" alt="image" src="https://github.com/user-attachments/assets/07233fb0-965b-4d6b-97ab-3e5448864eae" />
 
 
 ## Set up

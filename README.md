@@ -8,6 +8,8 @@ Pocket Docs combines keyword search with local MiniLM embeddings and on-device O
 
 See the [changelog](CHANGELOG.md) for version history, build results and response-format comparison notes.
 
+The example below is questioning the 'Attention Is All You Need' whitepaper stored on the phone
+
 <img width="618" height="820" alt="image" src="https://github.com/user-attachments/assets/63176f56-c0e1-403f-9f81-14c2a28af779" />
 
 

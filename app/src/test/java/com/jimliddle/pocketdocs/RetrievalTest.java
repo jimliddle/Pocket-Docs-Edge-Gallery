@@ -110,4 +110,71 @@ public class RetrievalTest {
             "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"search_documents\",\"arguments\":{\"query\":\"alpha\",\"limit\":2.5}}}");
     assertEquals(-32602, new McpEngine(null).handle(req).getJSONObject("error").getInt("code"));
   }
+
+  @Test
+  public void budgetSkipsChunkRatherThanCuttingItsExplanation() throws Exception {
+    String first = "alpha ".repeat(180), second = "beta ".repeat(180);
+    JSONArray out =
+        SearchResponse.compact(
+            new JSONArray()
+                .put(passage("a", first))
+                .put(passage("b", second))
+                .put(passage("c", "A short complete explanation.")),
+            "alpha",
+            8,
+            1600);
+    assertEquals(2, out.length());
+    assertEquals(first, out.getJSONObject(0).getString("text"));
+    assertEquals("c", out.getJSONObject(1).getString("passage_id"));
+    assertFalse(out.getJSONObject(1).getBoolean("excerpt"));
+  }
+
+  @Test
+  public void evidenceSettingChangesNextCallAndExplicitArgumentsOverrideDefaults()
+      throws Exception {
+    boolean[] broader = {true};
+    DocRepository repo =
+        new DocRepository() {
+          public JSONObject status() {
+            return new JSONObject();
+          }
+
+          public JSONObject passage(String id) {
+            return null;
+          }
+
+          public JSONArray search(String q, int n) throws Exception {
+            JSONArray out = new JSONArray();
+            for (int i = 0; i < 12; i++)
+              out.put(RetrievalTest.this.passage("id" + i, ("unique" + i + " ").repeat(180)));
+            return out;
+          }
+        };
+    McpEngine engine = new McpEngine(repo, () -> false, () -> broader[0]);
+    JSONObject req =
+        new JSONObject(
+            "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/call\",\"params\":{\"name\":\"search_documents\",\"arguments\":{\"query\":\"unique\"}}}");
+    assertEquals(8, passages(engine, req).length());
+    broader[0] = false;
+    assertEquals(3, passages(engine, req).length());
+    req.getJSONObject("params").getJSONObject("arguments").put("limit", 8).put("max_chars", 12800);
+    assertEquals(8, passages(engine, req).length());
+    req.getJSONObject("params").getJSONObject("arguments").put("max_chars", 1600);
+    assertEquals(1, passages(engine, req).length());
+    for (Object invalid : new Object[] {1599, 12801, 2000.5, "4800", JSONObject.NULL}) {
+      req.getJSONObject("params").getJSONObject("arguments").put("max_chars", invalid);
+      assertEquals(-32602, engine.handle(req).getJSONObject("error").getInt("code"));
+    }
+  }
+
+  private JSONArray passages(McpEngine engine, JSONObject request) throws Exception {
+    return new JSONObject(
+            engine
+                .handle(request)
+                .getJSONObject("result")
+                .getJSONArray("content")
+                .getJSONObject(0)
+                .getString("text"))
+        .getJSONArray("passages");
+  }
 }

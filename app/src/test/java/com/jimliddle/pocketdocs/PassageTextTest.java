@@ -26,7 +26,12 @@ public class PassageTextTest {
     JSONArray input = new JSONArray().put(passage("id-a", 2, text));
     String before = input.toString();
     String output = PassageText.format(input);
-    assertTrue(output.contains("Filename: Research \"notes\" α.pdf\nPage: 2\nChunk: 3\n"));
+    assertTrue(
+        output.contains(
+            "Filename: Research \"notes\" α.pdf\n"
+                + "Page: 2\n"
+                + "Citation: (Research \"notes\" α.pdf, page 2)\n"
+                + "Chunk: 3\n"));
     assertTrue(output.contains("Passage ID: id-a\n"));
     assertTrue(output.contains("Text:\n" + text + "\n--- End passage 1 ---"));
     assertFalse(output.contains("Candidate passages"));
@@ -65,6 +70,7 @@ public class PassageTextTest {
             .put("page", JSONObject.NULL);
     String output = PassageText.format(new JSONArray().put(p));
     assertFalse(output.contains("Page:"));
-    assertTrue(output.contains("Filename: warranty.txt\nChunk: 3\n"));
+    assertTrue(
+        output.contains("Filename: warranty.txt\nCitation: (warranty.txt, chunk 3)\nChunk: 3\n"));
   }
 }

@@ -86,12 +86,12 @@ Google states that ML Kit processes input and output on device, but the SDK can 
 | Tool | Arguments | Purpose |
 | --- | --- | --- |
 | `index_status` | None | Selected folders, last refresh, extraction issues and embedding coverage. |
-| `search_documents` | `query`, optional `limit` (1–10; default 3) | Hybrid search with compact excerpts. |
+| `search_documents` | `query`, optional `limit` (1–10), optional `max_chars` (1,600–12,800) | Hybrid search; app settings supply defaults. |
 | `get_passage` | `passage_id` | Full stored chunk from a search result. |
 
-Search returns chunks up to 1,600 characters each, with a 4,800 character total text budget. Sentence boundaries are preferred, but very long sentences or unpunctuated text can still be split. Similar passages and exact chunk overlap are reduced. An explicit high limit can return fewer passages because of that budget. Results include exact filename, PDF page or text file chunk, passage ID and extraction method. Full index status and vector scores are omitted from normal search output.
+Search returns up to eight chunks by default, each at most 1,600 characters, within a 12,800 character budget for passage text. Uncheck **More evidence** for three chunks and a 4,800 character budget. Explicit tool arguments override those defaults. Headers add to the response size; these are character budgets, not token limits. Pocket Docs cannot see the model’s remaining context space. Sentence boundaries are preferred, but very long sentences or unpunctuated text can still be split. Similar passages and exact chunk overlap are reduced. A chunk that cannot fit is skipped so that its explanation is not cut to fill the remaining space. An explicit high limit can return fewer passages because of that budget. Results include exact filename, PDF page or text file chunk, passage ID and extraction method. Full index status and vector scores are omitted from normal search output.
 
-Under **Search response format**, leave **Readable passages** checked for labelled text. Uncheck it for JSON text. The setting takes effect on the next tool call without restarting the server or refreshing folders.
+Under **Search response format**, leave **Readable passages** checked for labelled text. Uncheck it for JSON text. Both settings take effect on the next tool call without restarting the server or refreshing folders. Labelled results include a complete **Citation** line made from the stored filename and page. Edge Gallery still generates the final answer and can miscopy that line; Pocket Docs cannot validate or render citations inside another app.
 
 The server uses authenticated, stateless HTTP POST at `/mcp`, returning JSON. Supported MCP protocol versions are `2024-11-05`, `2025-03-26` and `2025-06-18`. SSE is not implemented. Only loopback connections are accepted; browser-origin requests are rejected.
 

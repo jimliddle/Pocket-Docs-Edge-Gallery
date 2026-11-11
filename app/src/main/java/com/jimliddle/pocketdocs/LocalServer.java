@@ -21,9 +21,17 @@ public final class LocalServer extends NanoHTTPD {
   }
 
   public LocalServer(String str, DocRepository docRepository, BooleanSupplier readableSearch) {
+    this(str, docRepository, readableSearch, () -> true);
+  }
+
+  public LocalServer(
+      String str,
+      DocRepository docRepository,
+      BooleanSupplier readableSearch,
+      BooleanSupplier broaderSearch) {
     super("127.0.0.1", PORT);
     this.secret = ("Bearer " + str).getBytes(StandardCharsets.UTF_8);
-    this.engine = new McpEngine(docRepository, readableSearch);
+    this.engine = new McpEngine(docRepository, readableSearch, broaderSearch);
   }
 
   private NanoHTTPD.Response json(JSONObject jSONObject) {

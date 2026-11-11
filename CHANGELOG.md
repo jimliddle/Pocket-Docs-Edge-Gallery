@@ -2,6 +2,20 @@
 
 Version history and build validation for Pocket Docs. See the [README](README.md) for setup, usage and build instructions.
 
+## 0.3.4 broader evidence
+
+PrivateLLMLens showed that the same model could answer this question when given a broader selection of passages. This build applies that finding to Pocket Docs:
+
+- **More evidence**, enabled by default, allows eight passages and 12,800 characters of passage text. Switch it off for three passages and 4,800 characters. The next search uses the setting; no folder refresh or server restart is needed.
+- `search_documents` accepts an optional `max_chars` budget. It keeps fitting chunks complete instead of cutting the final chunk to use the remaining space. Oversized chunks still use the existing extractive excerpt handling.
+- Readable results include an exact citation line alongside each passage. Filenames, page numbers and lookup IDs remain available.
+
+This does not copy PrivateLLMLens's entire pipeline: ranking and embeddings are unchanged, and Pocket Docs cannot insert a system message or render source links in Edge Gallery. It cannot know how much context Edge Gallery has left. The wider selection can add irrelevant passages and use more context; the compact setting is available for comparison.
+
+The real PDF/ONNX benchmark passes all 13 evidence checks with the wider setting. With the same strengthened checks, compact mode passes 11/13: it misses the explicit sequential-processing explanation for the original question and the positional-encoding evidence for the word-order question. The original question now includes page 2 chunk 1, but still does not retrieve the page 4 matrix-calculation passage seen in PrivateLLMLens. These tests check retrieved evidence, not Gemma's final answer.
+
+Android build validation is pending. No phone inference test has been run. This build uses the existing temporary debug-signing workflow; it is not guaranteed to install over a previous Actions APK. See the [build note](README.md#build).
+
 ## 0.3.3 response-format comparison
 
 [Download the 0.3.3 test APK ZIP](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42505958562/artifacts/13626659423) (GitHub sign-in required; extract `app-debug.apk`). The artifact expires on 6 February 2027. See the signing-key note under [Build in the README](README.md#build) before installing over a previous test build.

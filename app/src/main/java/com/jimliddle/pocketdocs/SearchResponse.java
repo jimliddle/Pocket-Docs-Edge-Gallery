@@ -5,7 +5,7 @@ import org.json.*;
 
 /** Bounded extractive output: never generates text or rewrites a citation. */
 public final class SearchResponse {
-  public static final int DEFAULT_LIMIT = 3, MAX_EXCERPT = 1600, MAX_TOTAL_TEXT = 4800;
+  public static final int DEFAULT_LIMIT = 8, MAX_EXCERPT = 1600, MAX_TOTAL_TEXT = 12800;
 
   public static String excerpt(String text, String query, int max) {
     if (text.length() <= max) return text;
@@ -56,9 +56,16 @@ public final class SearchResponse {
   }
 
   public static JSONArray compact(JSONArray input, String query, int limit) throws JSONException {
+    return compact(input, query, limit, MAX_TOTAL_TEXT);
+  }
+
+  public static JSONArray compact(JSONArray input, String query, int limit, int maxChars)
+      throws JSONException {
+    if (maxChars < MAX_EXCERPT || maxChars > MAX_TOTAL_TEXT)
+      throw new IllegalArgumentException("max_chars must be 1600–12800");
     JSONArray out = new JSONArray();
     List<String> accepted = new ArrayList<>();
-    int remaining = MAX_TOTAL_TEXT;
+    int remaining = maxChars;
     for (int i = 0; i < input.length() && out.length() < limit && remaining > 100; i++) {
       JSONObject p = input.getJSONObject(i);
       String text = p.getString("text");
@@ -86,7 +93,9 @@ public final class SearchResponse {
         }
       }
       if (reduced.isEmpty()) continue;
-      String excerpt = excerpt(reduced, query, Math.min(MAX_EXCERPT, remaining));
+      // Fit complete chunks where possible, rather than cutting the last one to fill a budget.
+      String excerpt = excerpt(reduced, query, MAX_EXCERPT);
+      if (excerpt.length() > remaining) continue;
       JSONObject result =
           new JSONObject()
               .put("passage_id", p.getString("passage_id"))

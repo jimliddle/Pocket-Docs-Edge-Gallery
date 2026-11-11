@@ -16,7 +16,8 @@ public final class Regression {
           + " through it one word at a time?",
       "self-attention",
       "paralleliz",
-      "recurrent"
+      "recurrent",
+      "sequential nature precludes parallelization"
     },
     {
       "sequential training",
@@ -114,6 +115,15 @@ public final class Regression {
                 HybridRanker.sorted(lex, 30),
                 HybridRanker.sorted(sem, 30),
                 SearchResponse.DEFAULT_LIMIT * 3)) candidates.put(corpus.get(hit.id));
+        JSONArray compact = SearchResponse.compact(candidates, test[1], 3, 4800);
+        StringBuilder compactText = new StringBuilder();
+        for (int i = 0; i < compact.length(); i++)
+          compactText.append(compact.getJSONObject(i).getString("text")).append(' ');
+        String oldEvidence =
+            compactText.toString().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
+        boolean compactOk = true;
+        for (int i = 2; i < test.length; i++) compactOk &= oldEvidence.contains(test[i]);
+        System.out.println("COMPACT | " + test[0] + " | " + (compactOk ? "PASS" : "MISS"));
         JSONArray returned =
             SearchResponse.compact(candidates, test[1], SearchResponse.DEFAULT_LIMIT);
         StringBuilder evidence = new StringBuilder(), ids = new StringBuilder();
@@ -125,7 +135,7 @@ public final class Regression {
         String normalized = evidence.toString().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");
         boolean ok = true;
         for (int i = 2; i < test.length; i++) ok &= normalized.contains(test[i]);
-        boolean knownMiss = test[0].equals("word order");
+        boolean knownMiss = false;
         if (ok) passed++;
         else if (!knownMiss) regressions++;
         fixtureCases.put(
@@ -161,9 +171,7 @@ public final class Regression {
                 .put("cases", fixtureCases)
                 .toString());
       }
-      if (regressions > 0)
-        throw new AssertionError(
-            regressions + " new evidence regressions (one documented miss remains)");
+      if (regressions > 0) throw new AssertionError(regressions + " evidence regressions");
     }
   }
 }

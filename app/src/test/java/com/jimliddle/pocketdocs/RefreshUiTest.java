@@ -28,7 +28,11 @@ public class RefreshUiTest {
   public void setup() {
     Context c = RuntimeEnvironment.getApplication();
     c.deleteDatabase("documents.db");
-    c.getSharedPreferences("settings", 0).edit().remove("readable_search").commit();
+    c.getSharedPreferences("settings", 0)
+        .edit()
+        .remove("readable_search")
+        .remove("broader_search")
+        .commit();
     c.getContentResolver()
         .takePersistableUriPermission(Uri.parse(uri), Intent.FLAG_GRANT_READ_URI_PERMISSION);
     store =
@@ -109,6 +113,20 @@ public class RefreshUiTest {
     controller = Robolectric.buildActivity(MainActivity.class).setup();
     activity = controller.get();
     assertFalse(((CheckBox) activity.findViewById(R.id.readable_search)).isChecked());
+    assertEquals(token, DocsService.token(activity));
+    assertEquals(1, store.roots().size());
+  }
+
+  @Test
+  public void evidenceSettingPersistsWithoutChangingTokenOrFolders() {
+    CheckBox toggle = activity.findViewById(R.id.broader_search);
+    assertTrue(toggle.isChecked());
+    String token = DocsService.token(activity);
+    toggle.setChecked(false);
+    controller.pause().stop().destroy();
+    controller = Robolectric.buildActivity(MainActivity.class).setup();
+    activity = controller.get();
+    assertFalse(((CheckBox) activity.findViewById(R.id.broader_search)).isChecked());
     assertEquals(token, DocsService.token(activity));
     assertEquals(1, store.roots().size());
   }

@@ -66,7 +66,8 @@ public final class DocsService extends Service {
           new LocalServer(
               token(this),
               Store.get(this),
-              () -> getSharedPreferences("settings", 0).getBoolean("readable_search", true));
+              () -> getSharedPreferences("settings", 0).getBoolean("readable_search", true),
+              () -> getSharedPreferences("settings", 0).getBoolean("broader_search", true));
       server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
       running = true;
       progress = "Ready on this phone";

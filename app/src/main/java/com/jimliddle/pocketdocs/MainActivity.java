@@ -72,7 +72,7 @@ public final class MainActivity extends Activity {
     text("Search response format", 21);
     CheckBox readable = new CheckBox(this);
     readable.setId(R.id.readable_search);
-    readable.setText("Readable passages (uncheck for previous JSON format)");
+    readable.setText("Readable passages (uncheck for JSON format)");
     readable.setChecked(getSharedPreferences("settings", 0).getBoolean("readable_search", true));
     readable.setOnCheckedChangeListener(
         (button, enabled) ->
@@ -81,6 +81,21 @@ public final class MainActivity extends Activity {
                 .putBoolean("readable_search", enabled)
                 .apply());
     body.addView(readable);
+    CheckBox broader = new CheckBox(this);
+    broader.setId(R.id.broader_search);
+    broader.setText("More evidence: up to 8 passages (uncheck for 3)");
+    broader.setChecked(getSharedPreferences("settings", 0).getBoolean("broader_search", true));
+    broader.setOnCheckedChangeListener(
+        (button, enabled) ->
+            getSharedPreferences("settings", 0)
+                .edit()
+                .putBoolean("broader_search", enabled)
+                .apply());
+    body.addView(broader);
+    text(
+        "More evidence allows 12,800 text characters; compact mode allows 4,800. "
+            + "The model also needs room for instructions, history and its answer.",
+        15);
     text("Applies to the next search. No server restart or folder refresh needed.", 15);
     text("Folders and indexing", 21);
     button(

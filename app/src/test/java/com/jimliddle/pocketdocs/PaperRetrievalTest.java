@@ -102,7 +102,7 @@ public class PaperRetrievalTest {
         StringBuilder text = new StringBuilder();
         StringBuilder locations = new StringBuilder();
         int chars = 0;
-        assertTrue(out.length() <= 3);
+        assertTrue(out.length() <= SearchResponse.DEFAULT_LIMIT);
         for (int n = 0; n < out.length(); n++) {
           JSONObject p = out.getJSONObject(n);
           assertEquals("1706.03762.pdf", p.getString("filename"));
@@ -115,7 +115,7 @@ public class PaperRetrievalTest {
               .append(" ");
           text.append(p.getString("text")).append(' ');
         }
-        assertTrue(chars <= 4800);
+        assertTrue(chars <= SearchResponse.MAX_TOTAL_TEXT);
         System.out.println(test.getString("name") + ": " + locations);
         if (test.getBoolean("known_miss")) continue;
         String normalized = text.toString().toLowerCase(Locale.ROOT).replaceAll("\\s+", " ");

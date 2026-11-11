@@ -4,4 +4,5 @@
     <item name="folder_coverage" type="id" />
     <item name="refresh_progress" type="id" />
     <item name="readable_search" type="id" />
+    <item name="broader_search" type="id" />
 </resources>

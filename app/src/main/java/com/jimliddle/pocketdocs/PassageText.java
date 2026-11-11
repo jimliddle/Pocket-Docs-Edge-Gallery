@@ -14,6 +14,10 @@ public final class PassageText {
       out.append("\n\n--- Passage ").append(i + 1).append(" ---\n");
       out.append("Filename: ").append(p.getString("filename")).append('\n');
       if (!p.isNull("page")) out.append("Page: ").append(p.get("page")).append('\n');
+      out.append("Citation: (").append(p.getString("filename"));
+      if (!p.isNull("page")) out.append(", page ").append(p.get("page"));
+      else out.append(", chunk ").append(p.getInt("chunk"));
+      out.append(")\n");
       out.append("Chunk: ").append(p.getInt("chunk")).append('\n');
       out.append("Passage ID: ").append(p.getString("passage_id")).append('\n');
       out.append("Extraction: ").append(p.optString("extraction", "text")).append('\n');

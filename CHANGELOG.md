@@ -14,7 +14,7 @@ This does not copy PrivateLLMLens's entire pipeline: ranking and embeddings are 
 
 The real PDF/ONNX benchmark passes all 13 evidence checks with the wider setting. With the same strengthened checks, compact mode passes 11/13: it misses the explicit sequential-processing explanation for the original question and the positional-encoding evidence for the word-order question. The original question now includes page 2 chunk 1, but still does not retrieve the page 4 matrix-calculation passage seen in PrivateLLMLens. These tests check retrieved evidence, not Gemma's final answer.
 
-Android build validation is pending. No phone inference test has been run. This build uses the existing temporary debug-signing workflow; it is not guaranteed to install over a previous Actions APK. See the [build note](README.md#build).
+[Download the 0.3.4 test APK ZIP](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42984213283/artifacts/13838433439) (GitHub sign-in required; extract `app-debug.apk`). It expires on 9 February 2027. [Build 42984213283](https://github.com/jimliddle/Pocket-Docs-Edge-Gallery/actions/runs/42984213283) built commit `8237c86ea98c79c7925b4cb01a38139ebf73528e`: 39 tests passed, none skipped; lint reported zero errors and 14 warnings. Tests include real-vector SQLite/MCP retrieval, budget validation, changing the evidence setting, persisted UI settings, citations, transport, indexing and OCR policy. No phone inference test has been run. This build uses the existing temporary debug-signing workflow; it is not guaranteed to install over a previous Actions APK. See the [build note](README.md#build).
 
 ## 0.3.3 response-format comparison
 
